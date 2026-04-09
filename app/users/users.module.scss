@@ -1,0 +1,29 @@
+.mainWrapper {
+  padding: 30px 15px;
+  width: calc(100% - 30px);
+}
+
+.gridRow {
+  display: grid;
+  grid-template-columns: 4fr 4fr 4fr 4fr 4fr 2fr 50px;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #595959;
+  place-items: center;
+  color: var(--text-color);
+
+  &:not(.headerRow):hover {
+    background-color: #424242;
+    color: var(--text-color);
+  }
+
+  .actionBtn {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.headerRow {
+  font-weight: bold;
+  border-top: 2px solid #7a7a7a;
+}
