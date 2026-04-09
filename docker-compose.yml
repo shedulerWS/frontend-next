@@ -1,0 +1,15 @@
+services:
+  nextjs:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+    container_name: scheduler_nextjs
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: shedulerWS_bridge
+    external: true
