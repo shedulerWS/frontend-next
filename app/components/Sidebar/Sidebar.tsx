@@ -17,7 +17,7 @@ export function Sidebar() {
       {!collapsed && (
         <div className={styles.menuList}>
           <Link href="/">Главная</Link>
-          <Link href="/productions">Продакшены</Link>
+          <Link href="/companies">Компании</Link>
           <Link href="/users">Пользователи</Link>
         </div>
       )}

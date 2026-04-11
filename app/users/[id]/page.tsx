@@ -10,12 +10,12 @@ interface User {
   name: string;
   username: string;
   role: { id: number; name: string } | null;
-  production: { id: number; name: string } | null;
+  company: { id: number; name: string } | null;
   created_at: string;
   is_active: boolean;
 }
 
-interface Production {
+interface Company {
   id: number;
   name: string;
 }
@@ -30,9 +30,9 @@ export default function UserShow() {
   const id = params.id;
 
   const [user, setUser] = useState<User | null>(null);
-  const [productions, setProductions] = useState<Production[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [selectedProduction, setSelectedProduction] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -47,7 +47,7 @@ export default function UserShow() {
         const res = await api.get(`/api/users/${id}`);
         if (!ignore) {
           setUser(res.data.data);
-          setSelectedProduction(res.data.data.production?.id?.toString() || "");
+          setSelectedCompany(res.data.data.company?.id?.toString() || "");
           setSelectedRole(res.data.data.role?.id?.toString() || "");
           setIsActive(!!res.data.data.is_active);
         }
@@ -58,12 +58,12 @@ export default function UserShow() {
       }
     };
 
-    const fetchProductions = async () => {
+    const fetchCompanies = async () => {
       try {
-        const res = await api.get("/api/productions");
-        if (!ignore) setProductions(res.data.data);
+        const res = await api.get("/api/companies");
+        if (!ignore) setCompanies(res.data.data);
       } catch (err) {
-        console.error("Ошибка загрузки продакшенов:", err);
+        console.error("Ошибка загрузки компаний:", err);
       }
     };
 
@@ -77,7 +77,7 @@ export default function UserShow() {
     };
 
     void fetchUser();
-    void fetchProductions();
+    void fetchCompanies();
     void fetchRoles();
 
     return () => { ignore = true; };
@@ -88,7 +88,7 @@ export default function UserShow() {
 
     try {
       const res = await api.patch(`/api/users/${id}`, {
-        production_id: selectedProduction || null,
+        company_id: selectedCompany || null,
         role_id: selectedRole || null,
         is_active: isActive,
       });
@@ -108,7 +108,7 @@ export default function UserShow() {
       <h1>{user.name}</h1>
       <p>Username: {user.username}</p>
       <p>Роль: {user.role?.name || "—"}</p>
-      {user.production && <p>Продакшн: {user.production.name}</p>}
+      {user.company && <p>Компания: {user.company.name}</p>}
       <p>Создан: {user.created_at}</p>
 
       <Link href={`/users/${user.id}/edit`}>Редактировать</Link>
@@ -116,12 +116,12 @@ export default function UserShow() {
       <hr />
 
       <form onSubmit={handleSave}>
-        <label>Прикрепить к продакшену:</label>
-        <select value={selectedProduction} onChange={(e) => setSelectedProduction(e.target.value)}>
-          <option value="">-- Не выбран --</option>
-          {productions.map((prod) => (
-            <option key={prod.id} value={prod.id}>
-              {prod.name}
+        <label>Прикрепить к компании:</label>
+        <select value={selectedCompany} onChange={(e) => setSelectedCompany(e.target.value)}>
+          <option value="">-- Не выбрана --</option>
+          {companies.map((company) => (
+            <option key={company.id} value={company.id}>
+              {company.name}
             </option>
           ))}
         </select>

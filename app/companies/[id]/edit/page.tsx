@@ -5,18 +5,18 @@ import { useParams } from "next/navigation";
 import axios from "axios";
 import api from "../../../lib/api";
 
-interface Production {
+interface Company {
   id: number;
   name: string;
   google_apps_script_url: string | null;
   reminder_minutes: number;
 }
 
-export default function ProductionEdit() {
+export default function CompanyEdit() {
   const params = useParams();
   const id = params.id;
 
-  const [production, setProduction] = useState<Production | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
   const [name, setName] = useState("");
   const [googleUrl, setGoogleUrl] = useState("");
   const [reminderMinutes, setReminderMinutes] = useState(5);
@@ -27,13 +27,13 @@ export default function ProductionEdit() {
   useEffect(() => {
     let ignore = false;
 
-    const fetchProduction = async () => {
+    const fetchCompany = async () => {
       try {
         setLoading(true);
-        const res = await api.get(`/api/productions/${id}`);
+        const res = await api.get(`/api/companies/${id}`);
         if (!ignore) {
           const data = res.data.data;
-          setProduction(data);
+          setCompany(data);
           setName(data.name || "");
           setGoogleUrl(data.google_apps_script_url || "");
           setReminderMinutes(data.reminder_minutes ?? 5);
@@ -45,7 +45,7 @@ export default function ProductionEdit() {
       }
     };
 
-    void fetchProduction();
+    void fetchCompany();
     return () => { ignore = true; };
   }, [id]);
 
@@ -55,13 +55,13 @@ export default function ProductionEdit() {
     setSuccess(null);
 
     try {
-      const res = await api.patch(`/api/productions/${id}`, {
+      const res = await api.patch(`/api/companies/${id}`, {
         name: name.trim(),
         google_apps_script_url: googleUrl || null,
         reminder_minutes: Number(reminderMinutes),
       });
-      setProduction(res.data.data);
-      setSuccess("✅ Продакшен обновлён");
+      setCompany(res.data.data);
+      setSuccess("✅ Компания обновлена");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || err.message);
@@ -72,12 +72,12 @@ export default function ProductionEdit() {
   };
 
   if (loading) return <p>Загрузка...</p>;
-  if (error && !production) return <p>Ошибка: {error}</p>;
-  if (!production) return <p>Продакшен не найден</p>;
+  if (error && !company) return <p>Ошибка: {error}</p>;
+  if (!company) return <p>Компания не найдена</p>;
 
   return (
     <div>
-      <h1>Редактирование: {production.name}</h1>
+      <h1>Редактирование: {company.name}</h1>
 
       <form onSubmit={handleSubmit}>
         <div>

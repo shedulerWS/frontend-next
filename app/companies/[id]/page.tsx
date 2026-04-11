@@ -5,29 +5,29 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "../../lib/api";
 
-interface Production {
+interface Company {
   id: number;
   name: string;
   google_apps_script_url: string | null;
 }
 
-export default function ProductionShow() {
+export default function CompanyShow() {
   const params = useParams();
   const router = useRouter();
   const id = params.id;
 
-  const [production, setProduction] = useState<Production | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let ignore = false;
 
-    const fetchProduction = async () => {
+    const fetchCompany = async () => {
       try {
         setLoading(true);
-        const res = await api.get(`/api/productions/${id}`);
-        if (!ignore) setProduction(res.data.data);
+        const res = await api.get(`/api/companies/${id}`);
+        if (!ignore) setCompany(res.data.data);
       } catch (err: unknown) {
         if (!ignore) setError(err instanceof Error ? err.message : "Ошибка");
       } finally {
@@ -35,16 +35,16 @@ export default function ProductionShow() {
       }
     };
 
-    void fetchProduction();
+    void fetchCompany();
     return () => { ignore = true; };
   }, [id]);
 
   const handleDelete = async () => {
-    if (!confirm("Перенести продакшен в архив?")) return;
+    if (!confirm("Перенести компанию в архив?")) return;
 
     try {
-      await api.delete(`/api/productions/${id}`);
-      router.push("/productions");
+      await api.delete(`/api/companies/${id}`);
+      router.push("/companies");
     } catch (err: unknown) {
       alert("Ошибка удаления: " + (err instanceof Error ? err.message : ""));
     }
@@ -52,15 +52,15 @@ export default function ProductionShow() {
 
   if (loading) return <p>Загрузка...</p>;
   if (error) return <p>Ошибка: {error}</p>;
-  if (!production) return <p>Продакшен не найден</p>;
+  if (!company) return <p>Компания не найдена</p>;
 
   return (
     <div>
-      <h1>{production.name}</h1>
-      <span>Script URL: {production.google_apps_script_url ? "✅" : "❌"}</span>
+      <h1>{company.name}</h1>
+      <span>Script URL: {company.google_apps_script_url ? "✅" : "❌"}</span>
       <br />
 
-      <Link href={`/productions/${production.id}/edit`}>Редактировать</Link>
+      <Link href={`/companies/${company.id}/edit`}>Редактировать</Link>
 
       <button onClick={handleDelete} style={{ marginLeft: "10px", color: "red" }}>
         В архив

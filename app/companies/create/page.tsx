@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import api from "../../lib/api";
 
-export default function ProductionCreate() {
+export default function CompanyCreate() {
   const [name, setName] = useState("");
   const [googleUrl, setGoogleUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -16,11 +16,11 @@ export default function ProductionCreate() {
     setSuccess(null);
 
     try {
-      await api.post("/api/productions", {
+      await api.post("/api/companies", {
         name,
         google_apps_script_url: googleUrl || null,
       });
-      setSuccess("Продакшен успешно создан!");
+      setSuccess("Компания успешно создана!");
       setName("");
       setGoogleUrl("");
     } catch (err: unknown) {
@@ -34,7 +34,7 @@ export default function ProductionCreate() {
 
   return (
     <div>
-      <h1>Добавить продакшен</h1>
+      <h1>Добавить компанию</h1>
 
       <form onSubmit={handleSubmit}>
         <div>
