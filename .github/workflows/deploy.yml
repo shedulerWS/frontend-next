@@ -70,6 +70,5 @@ jobs:
             docker run -d \
               --name scheduler_nextjs \
               --network shedulerWS_bridge \
-              -p 3000:3000 \
               --restart unless-stopped \
               ghcr.io/shedulerws/frontend-next:latest
