@@ -10,7 +10,7 @@ interface User {
   name: string;
   username: string;
   role: { id: number; name: string } | null;
-  company: { id: number; name: string } | null;
+  companies: { id: number; name: string }[];
   created_at: string;
   is_active: boolean;
 }
@@ -32,7 +32,7 @@ export default function UserShow() {
   const [user, setUser] = useState<User | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [selectedCompany, setSelectedCompany] = useState("");
+  const [selectedCompanyIds, setSelectedCompanyIds] = useState<number[]>([]);
   const [selectedRole, setSelectedRole] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -47,7 +47,9 @@ export default function UserShow() {
         const res = await api.get(`/api/users/${id}`);
         if (!ignore) {
           setUser(res.data.data);
-          setSelectedCompany(res.data.data.company?.id?.toString() || "");
+          setSelectedCompanyIds(
+            (res.data.data.companies ?? []).map((c: Company) => c.id),
+          );
           setSelectedRole(res.data.data.role?.id?.toString() || "");
           setIsActive(!!res.data.data.is_active);
         }
@@ -83,12 +85,20 @@ export default function UserShow() {
     return () => { ignore = true; };
   }, [id]);
 
+  const toggleCompany = (companyId: number) => {
+    setSelectedCompanyIds((prev) =>
+      prev.includes(companyId)
+        ? prev.filter((c) => c !== companyId)
+        : [...prev, companyId],
+    );
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       const res = await api.patch(`/api/users/${id}`, {
-        company_id: selectedCompany || null,
+        company_ids: selectedCompanyIds,
         role_id: selectedRole || null,
         is_active: isActive,
       });
@@ -108,7 +118,12 @@ export default function UserShow() {
       <h1>{user.name}</h1>
       <p>Username: {user.username}</p>
       <p>Роль: {user.role?.name || "—"}</p>
-      {user.company && <p>Компания: {user.company.name}</p>}
+      <p>
+        Компании:{" "}
+        {user.companies.length > 0
+          ? user.companies.map((c) => c.name).join(", ")
+          : "—"}
+      </p>
       <p>Создан: {user.created_at}</p>
 
       <Link href={`/users/${user.id}/edit`}>Редактировать</Link>
@@ -116,17 +131,21 @@ export default function UserShow() {
       <hr />
 
       <form onSubmit={handleSave}>
-        <label>Прикрепить к компании:</label>
-        <select value={selectedCompany} onChange={(e) => setSelectedCompany(e.target.value)}>
-          <option value="">-- Не выбрана --</option>
+        <label>Прикрепить к компаниям:</label>
+        <div>
           {companies.map((company) => (
-            <option key={company.id} value={company.id}>
+            <label key={company.id} style={{ display: "block" }}>
+              <input
+                type="checkbox"
+                checked={selectedCompanyIds.includes(company.id)}
+                onChange={() => toggleCompany(company.id)}
+              />
               {company.name}
-            </option>
+            </label>
           ))}
-        </select>
+        </div>
 
-        <br /><br />
+        <br />
 
         <label>Роль:</label>
         <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>

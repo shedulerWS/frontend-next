@@ -12,7 +12,7 @@ interface User {
   name: string;
   username: string;
   telegram_chat_id: number | null;
-  company: { id: number; name: string } | null;
+  companies: { id: number; name: string }[];
   role: { id: number; name: string } | null;
   is_active: boolean;
 }
@@ -207,7 +207,11 @@ function Users() {
                 <div>{user.name}</div>
                 <div>{user.username}</div>
                 <div>{user.telegram_chat_id}</div>
-                <div>{user.company?.name ?? "—"}</div>
+                <div>
+                  {user.companies.length > 0
+                    ? user.companies.map((c) => c.name).join(", ")
+                    : "—"}
+                </div>
                 <div>{user.role?.name ?? "—"}</div>
                 <div>{user.is_active ? "✅" : "❌"}</div>
                 <div className={styles.actionBtn}>
