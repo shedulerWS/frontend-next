@@ -13,6 +13,7 @@ interface User {
   companies: { id: number; name: string }[];
   created_at: string;
   is_active: boolean;
+  last_notified_at: string | null;
 }
 
 interface Company {
@@ -34,6 +35,7 @@ export default function UserShow() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedCompanyIds, setSelectedCompanyIds] = useState<number[]>([]);
   const [selectedRole, setSelectedRole] = useState("");
+  const [isActive, setIsActive] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,6 +52,7 @@ export default function UserShow() {
             (res.data.data.companies ?? []).map((c: Company) => c.id),
           );
           setSelectedRole(res.data.data.role?.id?.toString() || "");
+          setIsActive(!!res.data.data.is_active);
         }
       } catch (err: unknown) {
         if (!ignore) setError(err instanceof Error ? err.message : "Ошибка");
@@ -98,6 +101,7 @@ export default function UserShow() {
       const res = await api.patch(`/api/users/${id}`, {
         company_ids: selectedCompanyIds,
         role_id: selectedRole || null,
+        is_active: isActive,
       });
       setUser(res.data.data);
       alert("✅ Пользователь обновлён");
@@ -122,6 +126,7 @@ export default function UserShow() {
           : "—"}
       </p>
       <p>Создан: {user.created_at}</p>
+      <p>Последнее уведомление: {user.last_notified_at ?? "— (ни разу)"}</p>
 
       <Link href={`/users/${user.id}/edit`}>Редактировать</Link>
 
@@ -156,16 +161,16 @@ export default function UserShow() {
 
         <br /><br />
 
-        <div>
-          Активен: {user.is_active ? "✅" : "❌"}
-          <br />
-          <small>
-            Проставляется автоматически: активен, если уведомление приходило за
-            последнюю неделю.
-          </small>
-        </div>
+        <label>
+          <input
+            type="checkbox"
+            checked={isActive}
+            onChange={(e) => setIsActive(e.target.checked)}
+          />
+          Активен
+        </label>
 
-        <br />
+        <br /><br />
 
         <button type="submit">Сохранить</button>
       </form>
