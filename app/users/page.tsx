@@ -15,6 +15,7 @@ interface User {
   companies: { id: number; name: string }[];
   role: { id: number; name: string } | null;
   is_active: boolean;
+  last_notified_at: string | null;
 }
 
 interface Company {
@@ -195,6 +196,7 @@ function Users() {
               <div>Компания</div>
               <div>Роль</div>
               <div>Активен</div>
+              <div>Последнее увед.</div>
               <div></div>
             </div>
 
@@ -214,6 +216,7 @@ function Users() {
                 </div>
                 <div>{user.role?.name ?? "—"}</div>
                 <div>{user.is_active ? "✅" : "❌"}</div>
+                <div>{user.last_notified_at ?? "— (ни разу)"}</div>
                 <div className={styles.actionBtn}>
                   <Link href={`/users/${user.id}`}>👁</Link>
                   <Link href={`/users/${user.id}/edit`}>🖊</Link>
